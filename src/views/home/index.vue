@@ -18,6 +18,22 @@
         <div>很抱歉，您所在的地区暂未开启数字人民币试点工作，无法领取红包</div>
         <div class="btn">请联系赠奖商户</div>
       </div>
+      <div v-if="!supportFlag" class="outer">
+        <div class="description">
+          <div class="title">试点地区</div>
+          <ul class="explain-box">
+            <li class="explain-item">
+              •
+              数字人民币面向试点地区开展试点工作，需根据您所在位置判断是否符合领取条件。
+            </li>
+            <li class="explain-item">• 活动时间：2023年3月1日-2023年4月1日</li>
+            <li class="explain-item">
+              •
+              试点地区包括：北京，天津，河北省，大连，上海，江苏省，浙江（杭州、宁波、温州、湖州、绍兴、金华），福建（福州、厦门），山东（济南、青岛），长沙，广东省，广西（南宁、防城港），长沙，广东省，广西（南宁、防城港），海南省，重庆，四川省，云南（昆明，西双版纳），西安。
+            </li>
+          </ul>
+        </div>
+      </div>
       <div v-if="noLocation" class="explain location">
         <div>很抱歉，需要获取您的定位信息</div>
         <div class="btn">开放定位权限</div>
@@ -95,13 +111,13 @@ export default {
         sale: 10,
         activity: "数字人民币红包",
       },
-      supportFlag: true,
+      supportFlag: false,
       noLocation: false,
       cityCode: "",
     };
   },
   mounted() {
-    const { token } = this.$route.query;
+    const { token } = this.$route.params;
     this.token = token;
 
     if (window.AMap) {
@@ -161,7 +177,6 @@ export default {
         }, 1000);
       }
     },
-
     isMobile(phone) {
       let val = phone.replace(/\s/g, "");
       if (!val) {
@@ -224,11 +239,12 @@ export default {
             msg = `红包已发放至“数字人民币”APP`;
 
             const that = this;
-            Dialog({
-              title: "温馨提示",
-              message: "红包已发放至“数字人民币”APP",
-              confirm: this.openApp,
-              confirmButtonText: "去查看",
+            that.$router.push({
+              path: "/result",
+              query: {
+                sale: this.activityInfo.sale,
+                activity: this.activityInfo.activity,
+              },
             });
           } else {
             msg = "领取失败，请重试！";
