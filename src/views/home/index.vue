@@ -49,7 +49,27 @@
         </van-field>
         <div class="btn" @click="submitReciveMoney">领取红包</div>
       </div>
+      <div class="outer">
+        <div class="description">
+          <div class="title">活动概述</div>
+          <ul class="explain-box">
+            <li class="explain-item">• 活动对象：特约白名单用户。</li>
+            <li class="explain-item">• 活动时间：2023年3月1日-2023年4月1日</li>
+            <li class="explain-item">
+              •
+              活动地区：北京，天津，河北省，大连，上海，江苏省，浙江（杭州、宁波、温州、湖州、绍兴、金华），福建（福州、厦门），山东（济南、青岛），长沙，广东省，广西（南宁、防城港），长沙，广东省，广西（南宁、防城港），海南省，重庆，四川省，云南（昆明，西双版纳），西安。
+            </li>
+            <li class="explain-item">
+              • 红包查看路径：数字人民币APP-服务-消费红包
+            </li>
+            <li class="explain-item">
+              • 适用范围：可在任何支持数字人民币的场景下使用
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+
     <div class="bottom">
       Copyright © 2023北京华弘集成电路设计有限责任公司
       <div>All rights reserved.</div>
@@ -71,7 +91,10 @@ export default {
       count: "",
       token: "",
       loading: false,
-      activityInfo: {},
+      activityInfo: {
+        sale: 10,
+        activity: "数字人民币红包",
+      },
       supportFlag: true,
       noLocation: false,
       cityCode: "",
@@ -199,6 +222,14 @@ export default {
           let msg = "";
           if (tradeState === "03") {
             msg = `红包已发放至“数字人民币”APP`;
+
+            const that = this;
+            Dialog({
+              title: "温馨提示",
+              message: "红包已发放至“数字人民币”APP",
+              confirm: this.openApp,
+              confirmButtonText: "去查看",
+            });
           } else {
             msg = "领取失败，请重试！";
           }
@@ -340,6 +371,35 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .description {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0 30px 30px;
+    color: #555;
+    border: 2px solid #d6c90b;
+
+    .title {
+      line-height: 70px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: 500;
+      color: #444;
+      width: 300px;
+      background-color: #ee491bb7;
+      margin: 0 auto 20px;
+      color: #fff;
+    }
+    .explain-item {
+      margin-bottom: 10px;
+    }
+  }
+  .outer {
+    margin-top: 30px;
+
+    border-radius: 10px;
+    background-image: linear-gradient(#fffd8d, #fffd73);
+    padding: 15px;
   }
 }
 </style>
