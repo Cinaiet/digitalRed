@@ -7,7 +7,7 @@
       <div class="vouchers">
         <div class="vouchers-left">
           <div>待领取</div>
-          <div class="sale"><span>￥</span>{{ activityInfo.sale }}</div>
+          <div class="sale"><span>￥</span>{{ activityInfo.amt }}</div>
         </div>
         <div class="vouchers-right">
           <div>{{ activityInfo.activity }}</div>
@@ -26,10 +26,13 @@
               •
               数字人民币面向试点地区开展试点工作，需根据您所在位置判断是否符合领取条件。
             </li>
-            <li class="explain-item">• 活动时间：2023年3月1日-2023年4月1日</li>
             <li class="explain-item">
-              •
-              试点地区包括：北京，天津，河北省，大连，上海，江苏省，浙江（杭州、宁波、温州、湖州、绍兴、金华），福建（福州、厦门），山东（济南、青岛），长沙，广东省，广西（南宁、防城港），长沙，广东省，广西（南宁、防城港），海南省，重庆，四川省，云南（昆明，西双版纳），西安。
+              • 活动时间：{{ activityInfo.startDate }}-{{
+                activityInfo.endDate
+              }}
+            </li>
+            <li class="explain-item">
+              • 试点地区包括：<strong>{{ activityInfo.pilotArea }}</strong>
             </li>
           </ul>
         </div>
@@ -38,7 +41,7 @@
         <div>很抱歉，需要获取您的定位信息</div>
         <div class="btn">开放定位权限</div>
       </div>
-      <div class="submit">
+      <div v-if="!noLocation && supportFlag" class="submit">
         <div class="title">验证手机号</div>
         <van-field
           v-model="phone"
@@ -69,17 +72,20 @@
         <div class="description">
           <div class="title">活动概述</div>
           <ul class="explain-box">
-            <li class="explain-item">• 活动对象：特约白名单用户。</li>
-            <li class="explain-item">• 活动时间：2023年3月1日-2023年4月1日</li>
             <li class="explain-item">
-              •
-              活动地区：北京，天津，河北省，大连，上海，江苏省，浙江（杭州、宁波、温州、湖州、绍兴、金华），福建（福州、厦门），山东（济南、青岛），长沙，广东省，广西（南宁、防城港），长沙，广东省，广西（南宁、防城港），海南省，重庆，四川省，云南（昆明，西双版纳），西安。
+              <strong>• 活动对象：</strong>特约白名单用户。
             </li>
             <li class="explain-item">
-              • 红包查看路径：数字人民币APP-服务-消费红包
+              <strong>• 活动时间：</strong> 2023年3月1日-2023年4月1日
             </li>
             <li class="explain-item">
-              • 适用范围：可在任何支持数字人民币的场景下使用
+              <strong>• 活动地区：</strong>{{ activityInfo.pilotArea }}
+            </li>
+            <li class="explain-item">
+              <strong>• 红包查看路径：</strong>数字人民币APP-服务-消费红包
+            </li>
+            <li class="explain-item">
+              <strong>• 适用范围：</strong>可在任何支持数字人民币的场景下使用
             </li>
           </ul>
         </div>
@@ -108,8 +114,11 @@ export default {
       token: "",
       loading: false,
       activityInfo: {
-        sale: 10,
+        amt: 10,
         activity: "数字人民币红包",
+        endDate: "",
+        startDate: "",
+        activityPeriod: "",
       },
       supportFlag: false,
       noLocation: false,
@@ -119,6 +128,7 @@ export default {
   mounted() {
     const { token } = this.$route.params;
     this.token = token;
+    this.queryMoneyInfo();
 
     if (window.AMap) {
       AMap.plugin("AMap.Geolocation", () => {
@@ -148,7 +158,7 @@ export default {
           const { flag } = res?.body || {};
           const state = flag === "Y";
           this.supportFlag = state;
-          if (state) {
+          if (!state) {
             Dialog({
               title: "温馨提示",
               message:
@@ -164,17 +174,21 @@ export default {
       }
       let TIME_COUNT = 60;
       if (!this.timer) {
-        this.submitMsgCode();
-        this.count = TIME_COUNT;
+        this.submitMsgCode().then((res) => {
+          const { code } = res;
+          if (code === "200") {
+            this.count = TIME_COUNT;
 
-        this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count--;
-          } else {
-            clearInterval(this.timer);
-            this.timer = null;
+            this.timer = setInterval(() => {
+              if (this.count > 0 && this.count <= TIME_COUNT) {
+                this.count--;
+              } else {
+                clearInterval(this.timer);
+                this.timer = null;
+              }
+            }, 1000);
           }
-        }, 1000);
+        });
       }
     },
     isMobile(phone) {
@@ -233,30 +247,41 @@ export default {
           custProvinceCode: this.cityCode,
         })
         .then((res) => {
-          const { tradeState } = res.body;
-          let msg = "";
+          const { tradeState, msg } = res.body;
           if (tradeState === "03") {
-            msg = `红包已发放至“数字人民币”APP`;
-
             const that = this;
             that.$router.push({
               path: "/result",
               query: {
-                sale: this.activityInfo.sale,
+                sale: this.activityInfo.amt,
                 activity: this.activityInfo.activity,
               },
             });
+            return;
           } else {
-            msg = "领取失败，请重试！";
+            Dialog({
+              title: "温馨提示",
+              message: msg,
+            });
           }
-          Toast.success(msg);
         });
     },
     queryMoneyInfo() {
       ajaxMethod.getJson(`/api/h5/redpacket/info/${this.token}`).then((res) => {
         const { body } = res;
 
-        this.activityInfo = body;
+        const { activityPeriod } = body;
+
+        const transData = activityPeriod.split(",");
+
+        const startDate = $dayjs(transData[0]).format("YYYY年MM月DD日");
+        const endDate = $dayjs(transData[1]).format("YYYY年MM月DD日");
+
+        this.activityInfo = {
+          ...body,
+          startDate,
+          endDate,
+        };
       });
     },
   },
@@ -405,17 +430,28 @@ export default {
       background-color: #ee491bb7;
       margin: 0 auto 20px;
       color: #fff;
+      border-radius: 0 0 10px 10px;
     }
     .explain-item {
       margin-bottom: 10px;
     }
   }
   .outer {
-    margin-top: 30px;
-
+    margin-top: 60px;
     border-radius: 10px;
     background-image: linear-gradient(#fffd8d, #fffd73);
     padding: 15px;
+    position: relative;
+    &:before {
+      width: 86%;
+      left: 7%;
+      height: 30px;
+      top: -30px;
+      background-color: rgba(255, 255, 255, 0.6);
+      border-radius: 10px 10px 0 0;
+      content: "";
+      position: absolute;
+    }
   }
 }
 </style>

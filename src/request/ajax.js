@@ -23,8 +23,10 @@ Axios.interceptors.request.use(async (config) => {
 Axios.interceptors.response.use(
   (response) => {
     //拦截响应，做统一处理
-    // if (response.data.code) {
-    // }
+    if (response.data.code !== "200") {
+      const { msg } = response.data;
+      vueObj.$toast.fail(msg);
+    }
     return response;
   }, //接口错误状态处理，也就是说无响应时的处理
   (error) => {

@@ -13,8 +13,8 @@ if (process.env.NODE_ENV === "development") {
   console.log(`\n接口对应为${api}环境\n`);
 }
 const proxyContext = {
-  500: "https://dev.metaboxglobal.cn",
-  800: "https://www.metaboxglobal.cn",
+  500: " https://ft70457008.zicp.fun",
+  800: " https://ft70457008.zicp.fun",
 };
 console.log(proxyContext[api === "other" ? "500" : api]);
 console.log(process.env.BASE_URL);
@@ -64,6 +64,7 @@ module.exports = {
       alias: {
         vue$: "vue/dist/vue.esm.js",
         "@": resolve("src"),
+        "@img": resolve("src/assets/images"),
       },
     },
   },
