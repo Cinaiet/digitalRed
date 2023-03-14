@@ -76,7 +76,8 @@
               <strong>• 活动对象：</strong>特约白名单用户。
             </li>
             <li class="explain-item">
-              <strong>• 活动时间：</strong> 2023年3月1日-2023年4月1日
+              <strong>• 活动时间：</strong> {{ activityInfo.startDate }} -
+              {{ activityInfo.endDate }}
             </li>
             <li class="explain-item">
               <strong>• 活动地区：</strong>{{ activityInfo.pilotArea }}
@@ -114,13 +115,13 @@ export default {
       token: "",
       loading: false,
       activityInfo: {
-        amt: 10,
+        amt: "",
         activity: "数字人民币红包",
         endDate: "",
         startDate: "",
         activityPeriod: "",
       },
-      supportFlag: false,
+      supportFlag: true,
       noLocation: false,
       cityCode: "",
     };
@@ -270,12 +271,15 @@ export default {
       ajaxMethod.getJson(`/api/h5/redpacket/info/${this.token}`).then((res) => {
         const { body } = res;
 
-        const { activityPeriod } = body;
+        const { activityPeriod = "" } = body;
 
         const transData = activityPeriod.split(",");
-
-        const startDate = $dayjs(transData[0]).format("YYYY年MM月DD日");
-        const endDate = $dayjs(transData[1]).format("YYYY年MM月DD日");
+        let startDate = "",
+          endDate = "";
+        if (transData.length > 1) {
+          startDate = this.$dayjs(transData[0]).format("YYYY年MM月DD日");
+          endDate = this.$dayjs(transData[1]).format("YYYY年MM月DD日");
+        }
 
         this.activityInfo = {
           ...body,
