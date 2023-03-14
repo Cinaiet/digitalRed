@@ -19,11 +19,16 @@ Axios.interceptors.request.use(async (config) => {
   return config;
 });
 
+const errorCodeList = ["50001", "50003", "40004", "40003", "40002", "40005"];
+
 // http response 拦截器
 Axios.interceptors.response.use(
   (response) => {
     //拦截响应，做统一处理
-    if (response.data.code !== "200") {
+    const errCode = response.data.code;
+    if (errorCodeList.includes(errCode)) {
+      // 不处理
+    } else if (response.data.code !== "200") {
       const { msg } = response.data;
       vueObj.$toast.fail(msg);
     }

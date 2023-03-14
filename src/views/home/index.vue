@@ -248,7 +248,7 @@ export default {
           custProvinceCode: this.cityCode,
         })
         .then((res) => {
-          const { tradeState, msg } = res.body;
+          const { tradeState } = res.body;
           if (tradeState === "03") {
             const that = this;
             that.$router.push({
@@ -262,7 +262,7 @@ export default {
           } else {
             Dialog({
               title: "温馨提示",
-              message: msg,
+              message: res.msg,
             });
           }
         });
