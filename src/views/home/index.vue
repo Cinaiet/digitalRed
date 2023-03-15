@@ -7,7 +7,9 @@
       <div class="vouchers">
         <div class="vouchers-left">
           <div>待领取</div>
-          <div class="sale"><span>￥</span>{{ activityInfo.amt }}</div>
+          <div class="sale">
+            <span>￥</span>{{ (activityInfo.amt / 100).toFixed(2) }}
+          </div>
         </div>
         <div class="vouchers-right">
           <div>{{ activityInfo.activity }}</div>
@@ -52,7 +54,6 @@
         <van-field
           v-model="sms"
           center
-          clearable
           label="短信验证码"
           placeholder="请输入短信验证码"
         >
@@ -155,7 +156,6 @@ export default {
       return ajaxMethod
         .postJson("/api/h5/pilotarea/check", payload)
         .then((res) => {
-          console.log("rr", res);
           const { flag } = res?.body || {};
           const state = flag === "Y";
           this.supportFlag = state;
@@ -204,19 +204,6 @@ export default {
         }
       }
     },
-
-    openApp() {
-      try {
-        window.location.href = "dcep://uniwallet/startApp";
-      } catch (error) {
-        window.location.href =
-          "https://pilot.app.ecny.pbcdci.cn/download/index.html";
-      } finally {
-        window.location.href =
-          "https://pilot.app.ecny.pbcdci.cn/download/index.html";
-      }
-    },
-
     submitMsgCode() {
       ajaxMethod.postJson("/api/h5/send/verifycode", {
         phone: this.phone,

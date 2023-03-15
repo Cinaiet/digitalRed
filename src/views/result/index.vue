@@ -5,7 +5,7 @@
       <div class="vouchers">
         <div class="vouchers-left">
           <div>已领取</div>
-          <div class="sale"><span>￥</span>{{ sale }}</div>
+          <div class="sale"><span>￥</span>{{ (sale / 100).toFixed(2) }}</div>
         </div>
         <div class="vouchers-right">
           <div>{{ activity }}</div>
