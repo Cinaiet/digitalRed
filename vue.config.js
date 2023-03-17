@@ -32,7 +32,7 @@ module.exports = {
     proxy: {
       "^/api": {
         ws: false,
-        target: "https://ft70457008.zicp.fun/",
+        target: "https://bhdc.50v50.com:7061/",
         pathRewrite: {
           "^/api": "/api",
         },

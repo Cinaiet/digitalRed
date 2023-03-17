@@ -1,5 +1,11 @@
 <template>
   <div class="home-box display-flex box-column">
+    <img class="home-img" :src="bgImg" alt="" />
+    <img class="home-logo" :src="logo" alt="" />
+    <img class="home-text" :src="homeText" alt="" />
+    <img class="home-pack" :src="redPackImg" alt="" />
+    <img class="home-amt" :src="amtImg" alt="" />
+
     <div class="loading" v-if="loading">
       <van-loading type="spinner" color="#ccc" />
     </div>
@@ -17,7 +23,7 @@
         </div>
       </div>
       <div v-if="!supportFlag" class="explain location permission">
-        <div>很抱歉，您所在的地区暂未开启数字人民币试点工作，无法领取红包</div>
+        <div>很抱歉，您所在的地区暂未开启数字⼈⺠币试点⼯作，⽆法领取红包</div>
         <div class="btn">请联系赠奖商户</div>
       </div>
       <div v-if="!supportFlag" class="outer">
@@ -40,7 +46,7 @@
         </div>
       </div>
       <div v-if="noLocation" class="explain location">
-        <div>很抱歉，需要获取您的定位信息</div>
+        <div>很抱歉，您所在的地区暂未开启数字⼈⺠币试点⼯作，⽆法领取红包</div>
         <div class="btn">开放定位权限</div>
       </div>
       <div v-if="!noLocation && supportFlag" class="submit">
@@ -54,8 +60,8 @@
         <van-field
           v-model="sms"
           center
-          label="短信验证码"
-          placeholder="请输入短信验证码"
+          label="验证码"
+          placeholder="请输入验证码"
         >
           <template #button>
             <van-button
@@ -92,11 +98,10 @@
           </ul>
         </div>
       </div>
-    </div>
-
-    <div class="bottom">
-      Copyright © 2023北京华弘集成电路设计有限责任公司
-      <div>All rights reserved.</div>
+      <div class="bottom">
+        Copyright © 2023北京华弘集成电路设计有限责任公司
+        <div>All rights reserved.</div>
+      </div>
     </div>
   </div>
 </template>
@@ -104,6 +109,11 @@
 <script>
 import ajaxMethod from "@/request/ajax";
 import { Toast, Dialog } from "vant";
+import bgImg from "@/assets/images/bg_new.png";
+import homeText from "@/assets/images/home-text.png";
+import logo from "@/assets/images/logo.png";
+import amtImg from "@/assets/images/amt.png";
+import redPackImg from "@/assets/images/red-package.png";
 
 export default {
   name: "index",
@@ -125,6 +135,11 @@ export default {
       supportFlag: true,
       noLocation: false,
       cityCode: "",
+      bgImg,
+      homeText,
+      logo,
+      amtImg,
+      redPackImg,
     };
   },
   mounted() {
@@ -175,21 +190,28 @@ export default {
       }
       let TIME_COUNT = 60;
       if (!this.timer) {
-        this.submitMsgCode().then((res) => {
-          const { code } = res;
-          if (code === "200") {
-            this.count = TIME_COUNT;
+        this.submitMsgCode()
+          .then((res) => {
+            const { code, msg } = res;
+            if (code === "200") {
+              this.count = TIME_COUNT;
 
-            this.timer = setInterval(() => {
-              if (this.count > 0 && this.count <= TIME_COUNT) {
-                this.count--;
-              } else {
-                clearInterval(this.timer);
-                this.timer = null;
-              }
-            }, 1000);
-          }
-        });
+              this.timer = setInterval(() => {
+                if (this.count > 0 && this.count <= TIME_COUNT) {
+                  this.count--;
+                } else {
+                  clearInterval(this.timer);
+                  this.timer = null;
+                }
+              }, 1000);
+            } else {
+              Dialog({
+                title: "温馨提示",
+                message: msg,
+              });
+            }
+          })
+          .catch((err) => {});
       }
     },
     isMobile(phone) {
@@ -205,7 +227,7 @@ export default {
       }
     },
     submitMsgCode() {
-      ajaxMethod.postJson("/api/h5/send/verifycode", {
+      return ajaxMethod.postJson("/api/h5/send/verifycode", {
         phone: this.phone,
         token: this.token,
       });
@@ -281,10 +303,34 @@ export default {
 
 <style scoped lang="less">
 .home-box {
-  background-image: url("../../assets/images/u351.png");
   background-position: center;
   background-size: 100% 100%;
   overflow-y: scroll;
+  background-color: rgb(226, 51, 71);
+  position: relative;
+  .home-img {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+  .home-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+  .home-text {
+    position: absolute;
+    left: 5%;
+    width: 90%;
+    top: 160px;
+  }
+  .home-pack {
+    position: absolute;
+    left: 0;
+    top: 290px;
+  }
   .flexCenter() {
     display: flex;
     flex-direction: column;
@@ -292,9 +338,10 @@ export default {
     justify-content: center;
   }
   .content {
-    padding: 600px 30px 0;
+    padding: 590px 30px 0;
+    position: absolute;
     .vouchers {
-      background-image: linear-gradient(#fffd8d, #fffd73);
+      background-image: linear-gradient(#ffff66, #ffcc00);
       padding: 15px;
       display: flex;
       align-items: center;
@@ -310,7 +357,7 @@ export default {
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
         .flexCenter();
-        border: 1px dashed #fff;
+        border: 2px solid #fff;
         color: #fff;
         .sale {
           display: inline-block;
@@ -326,7 +373,7 @@ export default {
         flex: 1;
         height: 160px;
         color: #ff402f;
-        font-size: 35px;
+        font-size: 32px;
         .flexCenter();
         > div:first-child {
           font-size: 40px;
@@ -366,9 +413,13 @@ export default {
       text-align: center;
       margin-bottom: 20px;
     }
+    /deep/ .van-cell {
+      font-size: 30px;
+    }
     /deep/.van-field__button {
-      min-width: 150px;
-      max-width: 150px;
+      min-width: 180px;
+      max-width: 180px;
+      text-align: center;
     }
     /deep/.van-button {
       min-width: 180px;
@@ -381,14 +432,15 @@ export default {
   .btn {
     background-color: #ee491bb7;
     margin-top: 0.4rem;
-    width: 5rem;
+    width: 500px;
     border-radius: 20px;
     line-height: 1.066667rem;
     cursor: pointer;
     margin: 0.4rem auto 0;
     color: #fff;
     text-align: center;
-    font-weight: 500;
+    font-weight: bold;
+    font-size: 32px;
   }
   .bottom {
     text-align: center;
@@ -405,17 +457,17 @@ export default {
     justify-content: center;
   }
   .description {
-    background: #fff;
+    background: #fff2dd;
     border-radius: 10px;
     padding: 0 30px 30px;
     color: #555;
-    border: 2px solid #d6c90b;
+    border: 2px solid #daad81;
 
     .title {
       line-height: 70px;
       text-align: center;
-      font-size: 32px;
-      font-weight: 500;
+      font-size: 34px;
+      font-weight: bold;
       color: #444;
       width: 300px;
       background-color: #ee491bb7;
@@ -430,7 +482,7 @@ export default {
   .outer {
     margin-top: 60px;
     border-radius: 10px;
-    background-image: linear-gradient(#fffd8d, #fffd73);
+    background-color: #fff2dd;
     padding: 15px;
     position: relative;
     &:before {

@@ -1,5 +1,8 @@
 <template>
   <div class="result">
+    <img class="home-img" :src="bgImg" alt="" />
+    <img class="home-logo" :src="logo" alt="" />
+    <img class="home-amt" :src="amtImg" alt="" />
     <div class="content">
       <div class="content-title">恭喜您，获得数字人民币红包！</div>
       <div class="vouchers">
@@ -40,7 +43,7 @@
               下载“数字人民币”APP，打开APP使用领取号码完成注册后，登录账号，即自动弹出中国银行红包。
             </div>
             <div class="use-step-img">
-              <div class="use-step-img-left">
+              <div class="use-step-img-left trans">
                 <img :src="oneStepImg" alt="" />
                 <div>①打开APP新用户注册</div>
               </div>
@@ -67,7 +70,7 @@
               <div class="use-step-img-right">
                 <img :src="two2Img" alt="" />
                 <div>②进入消费红包</div>
-                <img :src="two3Img" alt="" />
+                <img class="scale" :src="two3Img" alt="" />
                 <div>③确认收到红包</div>
               </div>
             </div>
@@ -114,10 +117,10 @@
           </li>
         </ul>
       </div>
-    </div>
-    <div class="bottom">
-      Copyright © 2023北京华弘集成电路设计有限责任公司
-      <div>All rights reserved.</div>
+      <div class="bottom">
+        Copyright © 2023北京华弘集成电路设计有限责任公司
+        <div>All rights reserved.</div>
+      </div>
     </div>
   </div>
 </template>
@@ -138,6 +141,11 @@ import f1Img from "@/assets/images/4-1.png";
 import f2Img from "@/assets/images/4-2.png";
 import f3Img from "@/assets/images/4-3.png";
 
+import bgImg from "@/assets/images/bg_new.png";
+import logo from "@/assets/images/logo.png";
+import amtImg from "@/assets/images/amt.png";
+import redPackImg from "@/assets/images/red-package.png";
+
 export default {
   name: "result",
   data() {
@@ -157,6 +165,10 @@ export default {
       timer: null,
       sale: 10,
       activity: "数字人民币红包",
+      bgImg,
+      logo,
+      amtImg,
+      redPackImg,
     };
   },
   mounted() {
@@ -187,28 +199,51 @@ export default {
 
 <style lang="less" scoped>
 .result {
-  background-image: url("../../assets/images/result_bg.png");
   background-position: center;
   background-size: 100% 100%;
   overflow-y: scroll;
+  background-color: rgb(226, 51, 71);
+  position: relative;
   .flexCenter() {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
+  .home-img {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+  .home-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+  .home-amt {
+    position: absolute;
+    left: -50px;
+    top: 280px;
+    z-index: 10;
+    width: 100%;
+  }
   .content {
-    padding: 100px 30px 0;
+    padding: 150px 30px 0;
+    position: absolute;
+    left: 0;
+    right: 0;
     &-title {
       color: #fffd8d;
       font-size: 40px;
-      font-weight: 500;
+      font-weight: bold;
       text-align: center;
       padding: 50px 0;
     }
 
     .vouchers {
-      background-image: linear-gradient(#fffd8d, #fffd73);
+      background-image: linear-gradient(#ffff66, #ffcc00);
       padding: 15px;
       display: flex;
       align-items: center;
@@ -224,7 +259,7 @@ export default {
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
         .flexCenter();
-        border: 1px dashed #fff;
+        border: 2px solid #fff;
         color: #fff;
         .sale {
           display: inline-block;
@@ -240,7 +275,8 @@ export default {
         flex: 1;
         height: 160px;
         color: #ff402f;
-        font-size: 35px;
+        font-size: 32px;
+
         .flexCenter();
         > div:first-child {
           font-size: 40px;
@@ -250,24 +286,36 @@ export default {
       }
     }
     .outer {
-      margin-top: 30px;
+      margin-top: 180px;
+      position: relative;
 
       border-radius: 10px;
-      background-image: linear-gradient(#fffd8d, #fffd73);
+      background-color: #fff2dd;
+
       padding: 15px;
+      &:before {
+        width: 86%;
+        left: 7%;
+        height: 30px;
+        top: -30px;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: 10px 10px 0 0;
+        content: "";
+        position: absolute;
+      }
       .description {
-        background: #fff;
+        background: #fff2dd;
+
         border-radius: 10px;
         padding: 0 30px 30px;
         color: #555;
-        border: 2px solid #d6c90b;
+        border: 2px solid #daad81;
 
         .title {
           line-height: 70px;
           text-align: center;
-          font-size: 32px;
-          font-weight: 500;
-          color: #444;
+          font-size: 34px;
+          font-weight: bold;
           width: 300px;
           background-color: #ee491bb7;
           margin: 0 auto 20px;
@@ -296,7 +344,7 @@ export default {
         margin: 0.4rem auto 0;
         color: #fff;
         text-align: center;
-        font-weight: 500;
+        font-weight: bold;
       }
     }
 
@@ -307,7 +355,7 @@ export default {
         text-align: center;
         width: 6rem;
         margin: auto;
-        color: #d6c90b;
+        color: #ddca92;
         font-size: 34px;
         font-weight: 500;
 
@@ -349,6 +397,12 @@ export default {
             > img {
               flex: 1;
             }
+          }
+          .scale {
+            margin-top: 24px;
+          }
+          .trans {
+            height: 1086px;
           }
         }
       }
