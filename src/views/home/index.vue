@@ -73,14 +73,16 @@
             >
           </template>
         </van-field>
-        <div class="btn" @click="submitReciveMoney">领取红包</div>
-        <!-- <van-button
+        <van-button
           class="btn"
           @click="submitReciveMoney"
           loading-type="spinner"
-          loading-text="加载中..."
+          loading-text="领取中..."
           text="领取红包"
-        /> -->
+          block
+          :loading="submitLoading"
+          :disabled="submitLoading"
+        />
       </div>
       <div class="outer">
         <div class="description">
@@ -147,6 +149,7 @@ export default {
       logo,
       amtImg,
       redPackImg,
+      submitLoading: true,
     };
   },
   mounted() {
@@ -257,6 +260,7 @@ export default {
         return;
       }
       const that = this;
+      this.submitLoading = true;
 
       ajaxMethod
         .postJson("/api/h5/redpacket/receive", {
@@ -269,8 +273,8 @@ export default {
           const { tradeState, orderNo } = res.body;
           if (tradeState === "00") {
             that.queryReciveState(orderNo);
-          }
-          if (tradeState === "03" || tradeState === "02") {
+          } else if (tradeState === "03" || tradeState === "02") {
+            this.submitLoading = false;
             that.$router.push({
               path: "/result",
               query: {
@@ -280,6 +284,7 @@ export default {
             });
             return;
           } else {
+            this.submitLoading = false;
             Dialog({
               title: "温馨提示",
               message: res.msg,
@@ -315,18 +320,19 @@ export default {
     ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
       const { body } = res;
       const { tradeState } = body;
-      Toast.clear(true);
+      // Toast.clear(true);
       if (tradeState === "00") {
-        Toast.loading({
-          message: "加载中...",
-          forbidClick: true,
-          loadingType: "spinner",
-          duration: 0,
-        });
+        // Toast.loading({
+        //   message: "领取中...",
+        //   forbidClick: true,
+        //   loadingType: "spinner",
+        //   duration: 0,
+        // });
         setTimeout(() => {
           that.queryReciveState(orderNo);
         }, 1000);
       } else if (tradeState === "03" || tradeState === "02") {
+        that.submitLoading = false;
         that.$router.push({
           path: "/result",
           query: {
@@ -336,6 +342,7 @@ export default {
         });
         return;
       } else {
+        that.submitLoading = false;
         Dialog({
           title: "温馨提示",
           message: res.msg,

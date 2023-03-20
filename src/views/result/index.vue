@@ -48,10 +48,14 @@
                 <div>①打开APP新用户注册</div>
               </div>
               <div class="use-step-img-right">
-                <img :src="twoStepImg" alt="" />
-                <div>②APP账户登录</div>
-                <img :src="threeStepImg" alt="" />
-                <div>③登录后进入首页</div>
+                <div class="right-con">
+                  <img :src="twoStepImg" alt="" />
+                  <div>②APP账户登录</div>
+                </div>
+                <div class="right-con">
+                  <img :src="threeStepImg" alt="" />
+                  <div>③登录后进入首页</div>
+                </div>
               </div>
             </div>
           </li>
@@ -68,10 +72,14 @@
                 <div>①完成开通中行钱包</div>
               </div>
               <div class="use-step-img-right">
-                <img :src="two2Img" alt="" />
-                <div>②进入消费红包</div>
-                <img class="scale" :src="two3Img" alt="" />
-                <div>③确认收到红包</div>
+                <div class="right-con special">
+                  <img :src="two2Img" alt="" />
+                  <div>②进入消费红包</div>
+                </div>
+                <div class="right-con">
+                  <img class="scale" :src="two3Img" alt="" />
+                  <div>③确认收到红包</div>
+                </div>
               </div>
             </div>
           </li>
@@ -88,10 +96,14 @@
                 <div>①进入主页-扫一扫</div>
               </div>
               <div class="use-step-img-right">
-                <img :src="three2Img" alt="" />
-                <div>②使用红包抵扣</div>
-                <img :src="three3Img" alt="" />
-                <div>③完成付款</div>
+                <div class="right-con">
+                  <img :src="three2Img" alt="" />
+                  <div>②使用红包抵扣</div>
+                </div>
+                <div class="right-con">
+                  <img :src="three3Img" alt="" />
+                  <div>③完成付款</div>
+                </div>
               </div>
             </div>
           </li>
@@ -103,15 +115,19 @@
               进入“数字人民币”APP我的-钱包快付管理，开通线上平台的钱包快付，在付款时红包自动红包抵扣，完成消费。
             </div>
             <div class="use-step-img">
-              <div class="use-step-img-left">
+              <div class="use-step-img-left four-img">
                 <img :src="f1Img" alt="" />
                 <div>①进入我的-钱包快付管理</div>
               </div>
               <div class="use-step-img-right">
-                <img :src="f2Img" alt="" />
-                <div>②开通所需线上平台钱包快付</div>
-                <img :src="f3Img" alt="" />
-                <div>③在相应平台完成付款</div>
+                <div class="right-con">
+                  <img :src="f2Img" alt="" />
+                  <div>②开通所需线上平台钱包快付</div>
+                </div>
+                <div class="right-con">
+                  <img :src="f3Img" alt="" />
+                  <div>③在相应平台完成付款</div>
+                </div>
               </div>
             </div>
           </li>
@@ -383,14 +399,11 @@ export default {
         &-img {
           display: flex;
           margin-top: 15px;
+          font-size: 28px;
           > div {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            > div {
-              padding: 10px;
-            }
           }
           &-left {
             display: flex;
@@ -398,12 +411,34 @@ export default {
             > img {
               flex: 1;
             }
+            > div {
+              padding-left: 5px;
+            }
+          }
+          &-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+          .right-con {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            > div {
+              padding-left: 5px;
+            }
           }
           .scale {
             margin-top: 24px;
           }
           .trans {
-            height: 1086px;
+            // height: 946px;
+          }
+          .four-img {
+            height: 1015px;
+          }
+          .special {
+            // justify-content: space-between;
           }
         }
       }
