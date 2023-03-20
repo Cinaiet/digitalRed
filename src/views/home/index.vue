@@ -47,7 +47,7 @@
       </div>
       <div v-if="noLocation" class="explain location">
         <div>很抱歉，您所在的地区暂未开启数字⼈⺠币试点⼯作，⽆法领取红包</div>
-        <div class="btn">开放定位权限</div>
+        <div class="btn">请联系赠奖商户</div>
       </div>
       <div v-if="!noLocation && supportFlag" class="submit">
         <div class="title">验证手机号</div>
@@ -74,6 +74,13 @@
           </template>
         </van-field>
         <div class="btn" @click="submitReciveMoney">领取红包</div>
+        <!-- <van-button
+          class="btn"
+          @click="submitReciveMoney"
+          loading-type="spinner"
+          loading-text="加载中..."
+          text="领取红包"
+        /> -->
       </div>
       <div class="outer">
         <div class="description">
@@ -249,6 +256,8 @@ export default {
         Toast.fail("请填写短信验证码！");
         return;
       }
+      const that = this;
+
       ajaxMethod
         .postJson("/api/h5/redpacket/receive", {
           phone: this.phone,
@@ -257,9 +266,11 @@ export default {
           custProvinceCode: this.cityCode,
         })
         .then((res) => {
-          const { tradeState } = res.body;
-          if (tradeState === "03") {
-            const that = this;
+          const { tradeState, orderNo } = res.body;
+          if (tradeState === "00") {
+            that.queryReciveState(orderNo);
+          }
+          if (tradeState === "03" || tradeState === "02") {
             that.$router.push({
               path: "/result",
               query: {
@@ -297,6 +308,40 @@ export default {
         };
       });
     },
+  },
+
+  queryReciveState(orderNo) {
+    const that = this;
+    ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
+      const { body } = res;
+      const { tradeState } = body;
+      Toast.clear(true);
+      if (tradeState === "00") {
+        Toast.loading({
+          message: "加载中...",
+          forbidClick: true,
+          loadingType: "spinner",
+          duration: 0,
+        });
+        setTimeout(() => {
+          that.queryReciveState(orderNo);
+        }, 1000);
+      } else if (tradeState === "03" || tradeState === "02") {
+        that.$router.push({
+          path: "/result",
+          query: {
+            sale: that.activityInfo.amt,
+            activity: that.activityInfo.activity,
+          },
+        });
+        return;
+      } else {
+        Dialog({
+          title: "温馨提示",
+          message: res.msg,
+        });
+      }
+    });
   },
 };
 </script>
@@ -412,18 +457,19 @@ export default {
       color: #444;
       text-align: center;
       margin-bottom: 20px;
+      font-weight: bold;
     }
     /deep/ .van-cell {
       font-size: 30px;
     }
     /deep/.van-field__button {
-      min-width: 180px;
-      max-width: 180px;
+      min-width: 150px;
+      max-width: 150px;
       text-align: center;
     }
-    /deep/.van-button {
-      min-width: 180px;
-      max-width: 180px;
+    /deep/.van-cell .van-button {
+      min-width: 150px;
+      max-width: 150px;
       background-color: #ee491bb7;
       border: none;
       box-shadow: none;

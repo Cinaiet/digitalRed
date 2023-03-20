@@ -187,7 +187,8 @@ export default {
         "https://pilot.app.ecny.pbcdci.cn/download/index.html";
     },
     openAPP() {
-      window.location.href = "dcep://uniwallet/startApp";
+      window.location.href =
+        "dcep://uniwallet/startApp?appId=%s&extraInfo=&biz=openWallet&instNo=C1010411000013&version=1.0&signInfo=%s&sign=%s";
       this.timer = setTimeout(() => {
         window.location.href =
           "https://pilot.app.ecny.pbcdci.cn/download/index.html";
@@ -357,7 +358,7 @@ export default {
         margin: auto;
         color: #ddca92;
         font-size: 34px;
-        font-weight: 500;
+        font-weight: bold;
 
         background-color: rgb(222, 37, 29);
         border: 8px solid rgb(251, 211, 144);
