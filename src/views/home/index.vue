@@ -313,42 +313,41 @@ export default {
         };
       });
     },
-  },
-
-  queryReciveState(orderNo) {
-    const that = this;
-    ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
-      const { body } = res;
-      const { tradeState } = body;
-      // Toast.clear(true);
-      if (tradeState === "00") {
-        // Toast.loading({
-        //   message: "领取中...",
-        //   forbidClick: true,
-        //   loadingType: "spinner",
-        //   duration: 0,
-        // });
-        setTimeout(() => {
-          that.queryReciveState(orderNo);
-        }, 1000);
-      } else if (tradeState === "03" || tradeState === "02") {
-        that.submitLoading = false;
-        that.$router.push({
-          path: "/result",
-          query: {
-            sale: that.activityInfo.amt,
-            activity: that.activityInfo.activity,
-          },
-        });
-        return;
-      } else {
-        that.submitLoading = false;
-        Dialog({
-          title: "温馨提示",
-          message: res.msg,
-        });
-      }
-    });
+    queryReciveState(orderNo) {
+      const that = this;
+      ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
+        const { body } = res;
+        const { tradeState } = body;
+        // Toast.clear(true);
+        if (tradeState === "00") {
+          // Toast.loading({
+          //   message: "领取中...",
+          //   forbidClick: true,
+          //   loadingType: "spinner",
+          //   duration: 0,
+          // });
+          setTimeout(() => {
+            that.queryReciveState(orderNo);
+          }, 1000);
+        } else if (tradeState === "03" || tradeState === "02") {
+          that.submitLoading = false;
+          that.$router.push({
+            path: "/result",
+            query: {
+              sale: that.activityInfo.amt,
+              activity: that.activityInfo.activity,
+            },
+          });
+          return;
+        } else {
+          that.submitLoading = false;
+          Dialog({
+            title: "温馨提示",
+            message: res.msg,
+          });
+        }
+      });
+    },
   },
 };
 </script>
