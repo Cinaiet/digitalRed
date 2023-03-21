@@ -149,7 +149,7 @@ export default {
       logo,
       amtImg,
       redPackImg,
-      submitLoading: true,
+      submitLoading: false,
     };
   },
   mounted() {
