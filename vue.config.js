@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const packageJson = require('./package.json');
-const name = packageJson.name || 'digitalred';
+const fs = require("fs");
+const path = require("path");
+const packageJson = require("./package.json");
+const name = packageJson.name || "digitalred";
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
@@ -9,15 +9,15 @@ function resolve(dir) {
 const port = process.env.port || process.env.npm_config_port || 2048;
 const api = process.env.api || process.env.npm_config_api || 800;
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   console.log(`\n接口对应为${api}环境\n`);
 }
 const proxyContext = {
-  500: 'https://dev.metaboxglobal.cn',
-  800: 'https://www.metaboxglobal.cn',
+  500: " https://ft70457008.zicp.fun",
+  800: " https://ft70457008.zicp.fun",
 };
-console.log(proxyContext[api === 'other' ? '500' : api])
-console.log(process.env.BASE_URL)
+console.log(proxyContext[api === "other" ? "500" : api]);
+console.log(process.env.BASE_URL);
 module.exports = {
   publicPath: process.env.BASE_URL,
   outputDir: "dist",
@@ -30,12 +30,13 @@ module.exports = {
       errors: true,
     },
     proxy: {
-      '^/api': {
+      "^/api": {
         ws: false,
-        target: proxyContext[api === 'other' ? '500' : api],
+        target: "https://bhdc.50v50.com:7061/",
         pathRewrite: {
-          "^/api": "/api"
+          "^/api": "/api",
         },
+        changeOrigin: true,
       },
     },
   },
@@ -49,82 +50,78 @@ module.exports = {
       postcss: {
         plugins: [
           /* rem适配忽略文件目录 */
-          require('postcss-px2rem-exclude')({
-            remUnit: 75,  // 参数 1
-            exclude: /node_modules|vant/i,  // 参数 2
+          require("postcss-px2rem-exclude")({
+            remUnit: 75, // 参数 1
+            exclude: /node_modules|vant/i, // 参数 2
           }),
         ],
       },
-    }
+    },
   },
   configureWebpack: {
     name,
     resolve: {
       alias: {
-        'vue$':'vue/dist/vue.esm.js',
-        '@': resolve('src'),
+        vue$: "vue/dist/vue.esm.js",
+        "@": resolve("src"),
+        "@img": resolve("src/assets/images"),
       },
     },
   },
   chainWebpack(config) {
-    config.plugin('preload').tap(() => [
+    config.plugin("preload").tap(() => [
       {
-        rel: 'preload',
+        rel: "preload",
         fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial',
+        include: "initial",
       },
     ]);
 
-    config.plugins.delete('prefetch');
+    config.plugins.delete("prefetch");
 
+    config.module.rule("svg").exclude.add(resolve("src/icons")).end();
     config.module
-      .rule('svg')
-      .exclude.add(resolve('src/icons'))
-      .end();
-    config.module
-      .rule('icons')
+      .rule("icons")
       .test(/\.svg$/)
-      .include.add(resolve('src/icons'))
+      .include.add(resolve("src/icons"))
       .end()
-      .use('svg-sprite-loader')
-      .loader('svg-sprite-loader')
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
       .options({
-        symbolId: 'icon-[name]',
+        symbolId: "icon-[name]",
       })
       .end();
 
-    config.when(process.env.NODE_ENV !== 'development', (conf) => {
+    config.when(process.env.NODE_ENV !== "development", (conf) => {
       conf
-        .plugin('ScriptExtHtmlWebpackPlugin')
-        .after('html')
-        .use('script-ext-html-webpack-plugin', [
+        .plugin("ScriptExtHtmlWebpackPlugin")
+        .after("html")
+        .use("script-ext-html-webpack-plugin", [
           {
             inline: /runtime\..*\.js$/,
           },
         ])
         .end();
       conf.optimization.splitChunks({
-        chunks: 'all',
+        chunks: "all",
         cacheGroups: {
           libs: {
-            name: 'chunk-libs',
+            name: "chunk-libs",
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
-            chunks: 'initial',
+            chunks: "initial",
           },
           commons: {
-            name: 'chunk-commons',
-            test: resolve('src/components'),
+            name: "chunk-commons",
+            test: resolve("src/components"),
             minChunks: 3,
             priority: 5,
             reuseExistingChunk: true,
           },
         },
       });
-      conf.optimization.runtimeChunk('single');
-      conf.plugin('CompressionWebpackPlugin')
-        .use('compression-webpack-plugin');
+      conf.optimization.runtimeChunk("single");
+      conf.plugin("CompressionWebpackPlugin").use("compression-webpack-plugin");
     });
   },
-
-}
+};
