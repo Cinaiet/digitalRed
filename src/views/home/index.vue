@@ -123,6 +123,7 @@ import homeText from "@/assets/images/home-text.png";
 import logo from "@/assets/images/logo.png";
 import amtImg from "@/assets/images/amt.png";
 import redPackImg from "@/assets/images/red-package.png";
+import AMapLoader from '@amap/amap-jsapi-loader';
 
 export default {
   name: "index",
@@ -157,30 +158,36 @@ export default {
     this.token = token;
     this.queryMoneyInfo();
 
-    if (window.AMap) {
-      AMap.plugin("AMap.Geolocation", () => {
-        var geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true,
-          timeout: 10000,
-        });
-        geolocation.getCityInfo((status, result) => {
-          //只能获取当前用户所在城市和城市的经纬度
-          if (status == "complete") {
-            console.log("成功获取位置信息----->>>", result);
-            const { province, city, cityCode } = result;
-            this.queryActivityCity({ province, city });
-            this.cityCode = cityCode;
-          } else {
-            console.log("获取定位失败-->>", result);
-            this.noLocation = true;
-            Dialog({
-              title: "温馨提示",
-              message: "很抱歉，需要获取您的位置信息，请打开定位权限",
-            });
-          }
-        });
+
+    AMapLoader.load({
+      key: 'ecb7aed17d1fda77ba3ad8a73a8b99dc',
+      version: '2.0',
+      Loca: {
+        version: '2.0',
+      },
+      plugins: ['AMap.Geolocation'],
+    }).then((AMap) => {
+      var geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
       });
-    }
+      geolocation.getCityInfo((status, result) => {
+        //只能获取当前用户所在城市和城市的经纬度
+        if (status == "complete") {
+          console.log("成功获取位置信息----->>>", result);
+          const { province, city, cityCode } = result;
+          this.queryActivityCity({ province, city });
+          this.cityCode = cityCode;
+        } else {
+          console.log("获取定位失败-->>", result);
+          this.noLocation = true;
+          Dialog({
+            title: "温馨提示",
+            message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+          });
+        }
+      });
+    })
   },
   methods: {
     queryActivityCity(payload) {
