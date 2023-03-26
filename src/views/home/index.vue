@@ -165,7 +165,7 @@ export default {
       Loca: {
         version: '2.0',
       },
-      plugins: ['AMap.Geolocation'],
+      plugins: ['AMap.Geolocation', 'AMap.Geocoder'],
     }).then((AMap) => {
       var geolocation = new AMap.Geolocation({
         enableHighAccuracy: true,
@@ -179,12 +179,39 @@ export default {
           this.queryActivityCity({ province, city });
           this.cityCode = cityCode;
         } else {
-          console.log("获取定位失败-->>", result);
-          this.noLocation = true;
-          Dialog({
-            title: "温馨提示",
-            message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+          console.log("高德获取定位失败-->>", result);
+          // h5原生定位获取经纬度
+          navigator.geolocation.getCurrentPosition((position) => {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var geocoder = new AMap.Geocoder({
+              city: "010", //城市设为北京，默认：“全国”
+              radius: 1000 //范围，默认：500
+            });
+            // 高德根据经纬度获取城市信息
+            geocoder.getAddress([lon, lat], (status, result) => {
+              if (status === 'complete'&&result.regeocode) {
+                console.log("成功获取位置信息----->>>", result.regeocode);
+                // {"addressComponent":{"citycode":"0391","adcode":"410883","businessAreas":[],"neighborhoodType":"","neighborhood":"","building":"","buildingType":"","street":"","streetNumber":"","country":"中国","province":"河南省","city":"焦作市","district":"孟州市","towncode":"410883002000","township":"会昌街道"},"formattedAddress":"河南省焦作市孟州市会昌街道039县道","roads":[],"crosses":[],"pois":[]}
+                const { province, city, cityCode } = result.regeocode;
+                this.queryActivityCity({ province, city });
+                this.cityCode = cityCode;
+              }else{
+                this.noLocation = true;
+                Dialog({
+                  title: "温馨提示",
+                  message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+                });
+              }
+            });
+          }, () => {
+            this.noLocation = true;
+            Dialog({
+              title: "温馨提示",
+              message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+            });
           });
+
         }
       });
     })
