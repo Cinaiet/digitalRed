@@ -175,9 +175,32 @@ export default {
         //只能获取当前用户所在城市和城市的经纬度
         if (status == "complete") {
           console.log("成功获取位置信息----->>>", result);
-          const { province, city, cityCode } = result;
-          this.queryActivityCity({ province, city });
-          this.cityCode = cityCode;
+          const { province, city, cityCode, position } = result;
+          if (province && city) {
+            this.queryActivityCity({ province, city });
+            this.cityCode = cityCode;
+            return
+          }
+          var geocoder = new AMap.Geocoder();
+          // 高德根据经纬度获取城市信息
+          console.log(position)
+          geocoder.getAddress(position, (status, result) => {
+            console.log(status, result)
+            if (status === 'complete' && result.regeocode) {
+              console.log("成功获取位置信息----->>>", result.regeocode);
+              // {"addressComponent":{"citycode":"0391","adcode":"410883","businessAreas":[],"neighborhoodType":"","neighborhood":"","building":"","buildingType":"","street":"","streetNumber":"","country":"中国","province":"河南省","city":"焦作市","district":"孟州市","towncode":"410883002000","township":"会昌街道"},"formattedAddress":"河南省焦作市孟州市会昌街道039县道","roads":[],"crosses":[],"pois":[]}
+              const { province, city, cityCode } = result.regeocode.addressComponent;
+              console.log({ province, city })
+              this.queryActivityCity({ province, city });
+              this.cityCode = cityCode;
+            }else{
+              this.noLocation = true;
+              Dialog({
+                title: "温馨提示",
+                message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+              });
+            }
+          });
         } else {
           console.log("高德获取定位失败-->>", result);
           // h5原生定位获取经纬度
@@ -193,7 +216,7 @@ export default {
               if (status === 'complete'&&result.regeocode) {
                 console.log("成功获取位置信息----->>>", result.regeocode);
                 // {"addressComponent":{"citycode":"0391","adcode":"410883","businessAreas":[],"neighborhoodType":"","neighborhood":"","building":"","buildingType":"","street":"","streetNumber":"","country":"中国","province":"河南省","city":"焦作市","district":"孟州市","towncode":"410883002000","township":"会昌街道"},"formattedAddress":"河南省焦作市孟州市会昌街道039县道","roads":[],"crosses":[],"pois":[]}
-                const { province, city, cityCode } = result.regeocode;
+                const { province, city, cityCode } = result.regeocode.addressComponent;
                 this.queryActivityCity({ province, city });
                 this.cityCode = cityCode;
               }else{
