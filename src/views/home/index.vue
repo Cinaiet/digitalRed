@@ -160,17 +160,23 @@ export default {
     if (window.AMap) {
       AMap.plugin("AMap.Geolocation", () => {
         var geolocation = new AMap.Geolocation({
-          enableHighAccuracy: false,
+          enableHighAccuracy: true,
           timeout: 10000,
         });
         geolocation.getCityInfo((status, result) => {
           //只能获取当前用户所在城市和城市的经纬度
           if (status == "complete") {
+            console.log("成功获取位置信息----->>>", result);
             const { province, city, cityCode } = result;
             this.queryActivityCity({ province, city });
             this.cityCode = cityCode;
           } else {
+            console.log("获取定位失败-->>", result);
             this.noLocation = true;
+            Dialog({
+              title: "温馨提示",
+              message: "很抱歉，需要获取您的位置信息，请打开定位权限",
+            });
           }
         });
       });
@@ -313,42 +319,41 @@ export default {
         };
       });
     },
-  },
-
-  queryReciveState(orderNo) {
-    const that = this;
-    ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
-      const { body } = res;
-      const { tradeState } = body;
-      // Toast.clear(true);
-      if (tradeState === "00") {
-        // Toast.loading({
-        //   message: "领取中...",
-        //   forbidClick: true,
-        //   loadingType: "spinner",
-        //   duration: 0,
-        // });
-        setTimeout(() => {
-          that.queryReciveState(orderNo);
-        }, 1000);
-      } else if (tradeState === "03" || tradeState === "02") {
-        that.submitLoading = false;
-        that.$router.push({
-          path: "/result",
-          query: {
-            sale: that.activityInfo.amt,
-            activity: that.activityInfo.activity,
-          },
-        });
-        return;
-      } else {
-        that.submitLoading = false;
-        Dialog({
-          title: "温馨提示",
-          message: res.msg,
-        });
-      }
-    });
+    queryReciveState(orderNo) {
+      const that = this;
+      ajaxMethod.getJson(`/api/h5/redpacket/status/${orderNo}`).then((res) => {
+        const { body } = res;
+        const { tradeState } = body;
+        // Toast.clear(true);
+        if (tradeState === "00") {
+          // Toast.loading({
+          //   message: "领取中...",
+          //   forbidClick: true,
+          //   loadingType: "spinner",
+          //   duration: 0,
+          // });
+          setTimeout(() => {
+            that.queryReciveState(orderNo);
+          }, 1000);
+        } else if (tradeState === "03" || tradeState === "02") {
+          that.submitLoading = false;
+          that.$router.push({
+            path: "/result",
+            query: {
+              sale: that.activityInfo.amt,
+              activity: that.activityInfo.activity,
+            },
+          });
+          return;
+        } else {
+          that.submitLoading = false;
+          Dialog({
+            title: "温馨提示",
+            message: res.msg,
+          });
+        }
+      });
+    },
   },
 };
 </script>
